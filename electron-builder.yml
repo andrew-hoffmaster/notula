@@ -1,0 +1,44 @@
+appId: com.hoffmastertech.notula
+productName: Notula
+copyright: © 2026 Andrew Hoffmaster
+
+directories:
+  output: dist
+  buildResources: build
+
+# Only ship the built app + the runtime window icon. electron-builder adds the
+# production node_modules automatically.
+files:
+  - out/**/*
+  - resources/icon.png
+  - package.json
+
+# No native modules to rebuild — skip it for faster packaging.
+npmRebuild: false
+
+# --- Windows: NSIS installer (unsigned) ---
+win:
+  target: [nsis]
+  icon: build/icon.png
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+
+# --- macOS: .dmg (unsigned — must be built ON a Mac) ---
+mac:
+  target: [dmg]
+  category: public.app-category.productivity
+  icon: build/icon.png
+  identity: null # unsigned; set up Developer ID + notarization later
+
+# --- Linux: AppImage (universal), plus .deb (Ubuntu) and .rpm (RHEL) ---
+linux:
+  target: [AppImage, deb, rpm]
+  category: Office
+  synopsis: Local-first Markdown editor
+  description: A cross-platform, local-first Markdown editor. Plain .md files, no server, no account.
+  maintainer: Andrew Hoffmaster <andrew@hoffmastertech.com>
+  icon: build/icon.png
