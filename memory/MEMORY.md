@@ -1,0 +1,1 @@
+- [Dev launch env](dev-launch-env.md) — clear ELECTRON_RUN_AS_NODE to run the GUI; main/preload are CJS
