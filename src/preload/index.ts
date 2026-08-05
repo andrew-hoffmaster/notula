@@ -35,6 +35,23 @@ const api: Api = {
     docx: () => ipcRenderer.invoke('import:docx'),
     csv: () => ipcRenderer.invoke('import:csv')
   },
+  app: {
+    onMenu: (cb) => {
+      const listener = (_e: IpcRendererEvent, action: string) => cb(action)
+      ipcRenderer.on('menu:action', listener)
+      return () => ipcRenderer.removeListener('menu:action', listener)
+    },
+    onBeforeClose: (flush) => {
+      ipcRenderer.on('app:before-close', async () => {
+        try {
+          await flush()
+        } finally {
+          ipcRenderer.send('app:flush-done')
+        }
+      })
+    },
+    reportError: (message) => ipcRenderer.send('log:error', message)
+  },
   git: {
     status: () => ipcRenderer.invoke('git:status'),
     init: () => ipcRenderer.invoke('git:init'),

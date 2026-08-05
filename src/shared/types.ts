@@ -104,6 +104,15 @@ export interface Api {
      */
     csv(): Promise<{ name: string; markdown: string } | null>
   }
+  /** App-level integration: native menu, quit lifecycle, error reporting. */
+  app: {
+    /** Subscribe to native-menu actions (New Note, Save, …). Returns unsubscribe. */
+    onMenu(cb: (action: string) => void): () => void
+    /** Register a flush run before the window closes (persist unsaved edits). */
+    onBeforeClose(flush: () => Promise<void>): void
+    /** Report a renderer error to the main-process log. */
+    reportError(message: string): void
+  }
   /** Git source control over the open vault (design reversal — see docs). */
   git: {
     status(): Promise<GitStatus>

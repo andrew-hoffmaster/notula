@@ -24,9 +24,19 @@ import { assetFilename, convertDocx, extForContentType } from './docx.js'
 import { csvToMarkdownTable } from '../shared/csv.js'
 import * as git from './git.js'
 import electronUpdater from 'electron-updater'
+import log from 'electron-log/main'
 import { loadSettings, updateSettings } from './settings.js'
+import { buildAppMenu } from './menu.js'
 import icon from '../../resources/icon.png?asset'
 import type { DocxImport, FileChangeEvent, PdfOptions, VaultInfo } from '../shared/types.js'
+
+// Persistent logging to userData/logs, plus renderer capture and updater logs.
+log.initialize()
+electronUpdater.autoUpdater.logger = log
+
+// Never let an unhandled error take the process down silently.
+process.on('uncaughtException', (err) => log.error('uncaughtException:', err))
+process.on('unhandledRejection', (reason) => log.error('unhandledRejection:', reason))
 
 /** The currently open vault root. `null` until the user opens one. */
 let vaultRoot: string | null = null
@@ -108,6 +118,26 @@ function createWindow(): BrowserWindow {
 
   win.once('ready-to-show', () => win.show())
   attachSpellCheckMenu(win)
+  Menu.setApplicationMenu(buildAppMenu(win))
+
+  // Flush unsaved edits before the window closes: intercept once, ask the
+  // renderer to persist dirty buffers, then destroy. A 2s cap avoids hanging.
+  let closing = false
+  win.on('close', (e) => {
+    if (closing || win.webContents.isDestroyed()) return
+    e.preventDefault()
+    closing = true
+    let done = false
+    const destroy = () => {
+      if (done) return
+      done = true
+      ipcMain.removeListener('app:flush-done', destroy)
+      win.destroy()
+    }
+    ipcMain.once('app:flush-done', destroy)
+    win.webContents.send('app:before-close')
+    setTimeout(destroy, 2000)
+  })
 
   // electron-vite injects the dev server URL; fall back to the built file.
   if (process.env['ELECTRON_RENDERER_URL']) {
@@ -154,6 +184,9 @@ function attachSpellCheckMenu(win: BrowserWindow): void {
 
 /** Register the IPC handlers backing `window.api`. */
 function registerIpc(win: BrowserWindow): void {
+  // Renderer crash/error reports land in the same log file as the main process.
+  ipcMain.on('log:error', (_e, message: string) => log.error('[renderer]', message))
+
   ipcMain.handle('vault:open', async (): Promise<VaultInfo | null> => {
     const result = await dialog.showOpenDialog({
       properties: ['openDirectory', 'createDirectory']

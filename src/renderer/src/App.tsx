@@ -263,28 +263,24 @@ export default function App(): React.JSX.Element {
     return rel
   }, [refreshTree])
 
-  // Global keyboard shortcuts (Ctrl on Win/Linux, Cmd on macOS).
+  // Native-menu actions (accelerators live on the menu, not a keydown listener).
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (!(e.ctrlKey || e.metaKey) || e.altKey) return
-      switch (e.key.toLowerCase()) {
-        case 'n':
-          e.preventDefault()
-          newNote()
-          break
-        case 's':
-          e.preventDefault()
-          saveActive()
-          break
-        case 'w':
-          e.preventDefault()
-          closeActive()
-          break
-      }
+    const actions: Record<string, () => void> = {
+      'new-note': newNote,
+      'new-folder': newFolder,
+      'open-vault': openVault,
+      save: saveActive,
+      'close-tab': closeActive,
+      help: () => setShowHelp(true),
+      settings: () => setShowSettings(true)
     }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [newNote, saveActive, closeActive])
+    return window.api.app.onMenu((action) => actions[action]?.())
+  }, [newNote, newFolder, openVault, saveActive, closeActive])
+
+  // Persist unsaved edits when the window is about to close.
+  useEffect(() => {
+    window.api.app.onBeforeClose(() => flushPendingSaves())
+  }, [flushPendingSaves])
 
   // Create and open a new note from imported Markdown (a collision-free name).
   const openImported = useCallback(async (name: string, markdown: string): Promise<string> => {
