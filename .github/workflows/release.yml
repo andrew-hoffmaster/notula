@@ -1,0 +1,42 @@
+name: Release
+
+# Build installers for all three OSes and upload them to a GitHub Release.
+# Trigger by pushing a version tag, e.g.  git tag v0.1.0 && git push origin v0.1.0
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch: {}
+
+permissions:
+  contents: write # create the release + upload assets
+
+jobs:
+  release:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # rpm/fakeroot are needed for the Linux .rpm target.
+      - name: Install Linux packaging tools
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y rpm fakeroot
+
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+      # electron-builder targets the current OS and publishes to the release
+      # for this tag. GH_TOKEN is the workflow's automatic token.
+      - name: Build & publish installers
+        run: npx electron-builder --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

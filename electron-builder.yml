@@ -6,6 +6,12 @@ directories:
   output: dist
   buildResources: build
 
+# Where `--publish` uploads to (the Release workflow does this on tag push).
+publish:
+  provider: github
+  owner: andrew-hoffmaster
+  repo: notula
+
 # Only ship the built app + the runtime window icon. electron-builder adds the
 # production node_modules automatically.
 files:
