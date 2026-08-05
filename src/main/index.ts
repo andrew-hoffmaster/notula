@@ -141,6 +141,18 @@ function createWindow(): BrowserWindow {
   attachSpellCheckMenu(win)
   Menu.setApplicationMenu(buildAppMenu(win))
 
+  // Keep the app on its own document: links open in the user's browser, never
+  // by navigating the window away (which would strand them off the SPA).
+  win.webContents.on('will-navigate', (e, url) => {
+    if (url === win.webContents.getURL()) return // allow reload
+    e.preventDefault()
+    if (/^https?:\/\//i.test(url)) void shell.openExternal(url)
+  })
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (/^https?:\/\//i.test(url)) void shell.openExternal(url)
+    return { action: 'deny' }
+  })
+
   // Flush unsaved edits before the window closes: intercept once, ask the
   // renderer to persist dirty buffers, then destroy. A 2s cap avoids hanging.
   let closing = false
