@@ -92,7 +92,7 @@ export async function listTree(root: string, rel = ''): Promise<FileNode[]> {
       if (children.length > 0) {
         nodes.push({ relPath: childRel, name: entry.name, isDir: true, children })
       }
-    } else if (entry.isFile() && /\.(md|markdown|csv)$/i.test(entry.name)) {
+    } else if (entry.isFile() && /\.(md|markdown|csv|pdf)$/i.test(entry.name)) {
       nodes.push({ relPath: childRel, name: entry.name, isDir: false })
     }
   }

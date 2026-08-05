@@ -43,6 +43,7 @@ import FileIcon from './components/FileIcon.js'
 import SourceControl from './components/SourceControl.js'
 import DiffModal from './components/DiffModal.js'
 import HistoryModal from './components/HistoryModal.js'
+import PdfViewer from './components/PdfViewer.js'
 import ActivityBar, { type SidebarView } from './components/ActivityBar.js'
 import { useGit } from './useGit.js'
 import { classify, type ChangeClass } from '@shared/git.js'
@@ -193,14 +194,12 @@ export default function App(): React.JSX.Element {
     if (vault) saveList(storageKey('expanded', vault.root), expanded)
   }, [expanded, vault])
 
-  const openFile = useCallback(
-    async (relPath: string) => {
-      const content = await window.api.file.read(relPath)
-      const name = relPath.split('/').pop() ?? relPath
-      dispatch({ type: 'open', relPath, name, content })
-    },
-    []
-  )
+  const openFile = useCallback(async (relPath: string) => {
+    // PDFs are rendered by the viewer, not read as text.
+    const content = /\.pdf$/i.test(relPath) ? '' : await window.api.file.read(relPath)
+    const name = relPath.split('/').pop() ?? relPath
+    dispatch({ type: 'open', relPath, name, content })
+  }, [])
 
   // Debounced auto-save: reset the timer on each edit, persist when it fires.
   const onEdit = useCallback((relPath: string, content: string) => {
@@ -492,7 +491,9 @@ export default function App(): React.JSX.Element {
           </div>
         </div>
         <div className="min-h-0 flex-1">
-          {current ? (
+          {current && /\.pdf$/i.test(current.relPath) ? (
+            <PdfViewer relPath={current.relPath} />
+          ) : current ? (
             <div className="flex h-full">
               <div className="flex min-w-0 flex-1 flex-col border-r border-line">
                 <Toolbar onFormat={(kind) => editorRef.current?.format(kind)} />

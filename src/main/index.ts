@@ -43,13 +43,15 @@ let vaultRoot: string | null = null
 /** Active chokidar watcher for the open vault, if any. */
 let watcher: FSWatcher | null = null
 
-/** Custom image scheme; must match the renderer's markdown pipeline. */
+/** Custom schemes; must match the renderer (image pipeline + PDF viewer). */
 const IMAGE_SCHEME = 'notula-img'
+const FILE_SCHEME = 'notula-file'
 
-// Privileged so <img src="notula-img://…"> loads like a normal secure image.
+// Privileged so <img>/<embed> can load them like normal secure resources.
 // Must run before app `ready`.
 protocol.registerSchemesAsPrivileged([
-  { scheme: IMAGE_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true } }
+  { scheme: IMAGE_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true } },
+  { scheme: FILE_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true } }
 ])
 
 /**
@@ -63,6 +65,25 @@ function registerImageProtocol(): void {
       const rel = decodeURIComponent(new URL(request.url).pathname).replace(/^\/+/, '')
       const abs = resolveInVault(vaultRoot, rel)
       return net.fetch(pathToFileURL(abs).toString())
+    } catch {
+      return new Response(null, { status: 403 })
+    }
+  })
+}
+
+/**
+ * Serve `notula-file://vault/<rel>` with an explicit content type — used by the
+ * in-app PDF viewer (`<embed type="application/pdf">`). Vault-scoped like above.
+ */
+function registerFileProtocol(): void {
+  protocol.handle(FILE_SCHEME, async (request) => {
+    if (!vaultRoot) return new Response(null, { status: 404 })
+    try {
+      const rel = decodeURIComponent(new URL(request.url).pathname).replace(/^\/+/, '')
+      const abs = resolveInVault(vaultRoot, rel)
+      const data = await fs.readFile(abs)
+      const type = rel.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'application/octet-stream'
+      return new Response(new Uint8Array(data), { headers: { 'content-type': type } })
     } catch {
       return new Response(null, { status: 403 })
     }
@@ -84,7 +105,7 @@ async function startWatching(root: string, win: BrowserWindow): Promise<void> {
     ignored: (p) => /(^|[\\/])\.[^\\/]+/.test(p)
   })
   const emit = (kind: FileChangeEvent['kind']) => (abs: string) => {
-    if (!/\.(md|markdown|csv)$/i.test(abs)) return
+    if (!/\.(md|markdown|csv|pdf)$/i.test(abs)) return
     const relPath = path.relative(root, abs).split(path.sep).join('/')
     if (!win.isDestroyed()) win.webContents.send('vault:change', { kind, relPath })
   }
@@ -335,6 +356,7 @@ function registerIpc(win: BrowserWindow): void {
 
 app.whenReady().then(async () => {
   registerImageProtocol()
+  registerFileProtocol()
   const win = createWindow()
   registerIpc(win)
 
