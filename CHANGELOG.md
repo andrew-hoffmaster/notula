@@ -6,12 +6,16 @@ All notable changes to Notula are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] — 2026-08-04
+
 ### Added
 - In-app **PDF viewing** — `.pdf` files open in Chromium's built-in viewer via a
   vault-scoped `notula-file://` protocol.
 - **About** dialog (Help → About Notula) showing app version and build info.
 - **Auto-update** via electron-updater (Windows/macOS/Linux AppImage).
 - **Native application menu** with accelerators, and persistent logging.
+- Production hardening: crash-recovery error boundary, flush-on-quit, ESLint +
+  Prettier, and a CI workflow (lint/typecheck/tests).
 
 ### Fixed
 - External links in the preview now open in the default browser instead of
@@ -35,5 +39,6 @@ Initial release.
 - **Git source control**: status badges, stage/commit/push/pull, diff & history.
 - Reopen last vault on launch; external-change reconciliation.
 
-[Unreleased]: https://github.com/andrew-hoffmaster/notula/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/andrew-hoffmaster/notula/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/andrew-hoffmaster/notula/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/andrew-hoffmaster/notula/releases/tag/v0.1.0

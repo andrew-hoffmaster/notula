@@ -22,6 +22,41 @@
 
 ---
 
+## Screenshots
+
+<!--
+  Drop images into docs/screenshots/ and uncomment. See docs/LAUNCH.md for the
+  shot list. Recommended: a hero shot of editor + live preview, then a gallery.
+
+<p align="center">
+  <img src="docs/screenshots/editor-preview.png" alt="Editor and live preview" width="820" />
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/mermaid.png" alt="Mermaid diagram" width="270" />
+  <img src="docs/screenshots/source-control.png" alt="Git source control" width="270" />
+  <img src="docs/screenshots/themes.png" alt="Themes" width="270" />
+</p>
+-->
+
+_Screenshots coming soon._
+
+## Download
+
+Grab the latest installer for your OS from the
+[**Releases**](https://github.com/andrew-hoffmaster/notula/releases/latest) page:
+
+| OS | File |
+|---|---|
+| Windows | `Notula-Setup-x.y.z.exe` |
+| macOS | `Notula-x.y.z.dmg` |
+| Linux | `Notula-x.y.z.AppImage` (universal) · `.deb` · `.rpm` |
+
+> Builds are **unsigned** (free software, no paid certificates). On first launch
+> macOS may say the app "can't be opened" — right-click the app → **Open**. On
+> Windows, click **More info → Run anyway**. Once installed, Notula updates
+> itself from future releases.
+
 ## Features
 
 **Editing**
