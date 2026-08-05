@@ -35,7 +35,7 @@ nsis:
 
 # --- macOS: .dmg (unsigned — must be built ON a Mac) ---
 mac:
-  target: [dmg]
+  target: [dmg, zip] # zip enables electron-updater auto-update on macOS
   category: public.app-category.productivity
   icon: build/icon.png
   identity: null # unsigned; set up Developer ID + notarization later

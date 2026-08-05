@@ -23,6 +23,7 @@ import { buildPrintHtml, WAIT_FOR_ASSETS } from './pdf.js'
 import { assetFilename, convertDocx, extForContentType } from './docx.js'
 import { csvToMarkdownTable } from '../shared/csv.js'
 import * as git from './git.js'
+import electronUpdater from 'electron-updater'
 import { loadSettings, updateSettings } from './settings.js'
 import icon from '../../resources/icon.png?asset'
 import type { DocxImport, FileChangeEvent, PdfOptions, VaultInfo } from '../shared/types.js'
@@ -303,6 +304,15 @@ app.whenReady().then(async () => {
   registerImageProtocol()
   const win = createWindow()
   registerIpc(win)
+
+  // Auto-update from GitHub Releases (packaged builds only; no-op in dev).
+  // Covers Windows NSIS, macOS zip, and Linux AppImage; deb/rpm update via the
+  // system package manager. Notifies and prompts to restart when ready.
+  if (app.isPackaged) {
+    electronUpdater.autoUpdater.checkForUpdatesAndNotify().catch(() => {
+      /* offline or no release yet — ignore */
+    })
+  }
 
   // Restore the last opened vault if its folder still exists, so the renderer
   // can reopen it on launch without re-prompting (design §4 machine state).

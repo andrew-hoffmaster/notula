@@ -11,6 +11,8 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/andrew-hoffmaster/notula/actions/workflows/release.yml"><img alt="Release" src="https://github.com/andrew-hoffmaster/notula/actions/workflows/release.yml/badge.svg" /></a>
+  <a href="https://github.com/andrew-hoffmaster/notula/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/andrew-hoffmaster/notula?color=9184d9" /></a>
   <img alt="Electron" src="https://img.shields.io/badge/Electron-2b2e3b?logo=electron&logoColor=9FEAF9" />
   <img alt="React" src="https://img.shields.io/badge/React-20232a?logo=react&logoColor=61DAFB" />
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" />

@@ -83,11 +83,15 @@ To add signing later, set electron-builder env vars in CI/locally:
   ID cert in the keychain; set `mac.identity` in the config.
 - Windows: `CSC_LINK` (path/base64 of the `.pfx`) and `CSC_KEY_PASSWORD`.
 
-## Auto-update (optional, later)
+## Auto-update
 
-`electron-updater` + publishing to GitHub Releases gives in-app updates for
-Windows (NSIS), macOS (dmg/zip), and Linux (AppImage). `.deb`/`.rpm` update via
-system package managers instead.
+Wired via `electron-updater` (see `src/main/index.ts`). On launch, a **packaged**
+build checks the latest GitHub Release, downloads a newer version in the
+background, and prompts to restart. No-ops in `dev`.
+
+Covers **Windows (NSIS)**, **macOS (zip)**, and **Linux (AppImage)**. `.deb`/`.rpm`
+update through the system package manager instead. Each release the CI publishes
+includes the `latest*.yml` metadata electron-updater needs.
 
 ## When you want all four automatically
 
