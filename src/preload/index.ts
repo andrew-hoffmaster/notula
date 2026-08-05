@@ -36,6 +36,7 @@ const api: Api = {
     csv: () => ipcRenderer.invoke('import:csv')
   },
   app: {
+    info: () => ipcRenderer.invoke('app:info'),
     onMenu: (cb) => {
       const listener = (_e: IpcRendererEvent, action: string) => cb(action)
       ipcRenderer.on('menu:action', listener)

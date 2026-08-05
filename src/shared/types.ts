@@ -54,6 +54,15 @@ export interface PdfOptions {
 
 import type { GitCommit, GitStatus } from './git.js'
 
+/** App version + runtime build info (About dialog). */
+export interface AppInfo {
+  version: string
+  electron: string
+  chrome: string
+  node: string
+  platform: string
+}
+
 /** The narrow API exposed to the renderer via contextBridge (design §3). */
 export interface Api {
   vault: {
@@ -106,6 +115,8 @@ export interface Api {
   }
   /** App-level integration: native menu, quit lifecycle, error reporting. */
   app: {
+    /** Version + build/runtime info for the About dialog. */
+    info(): Promise<AppInfo>
     /** Subscribe to native-menu actions (New Note, Save, …). Returns unsubscribe. */
     onMenu(cb: (action: string) => void): () => void
     /** Register a flush run before the window closes (persist unsaved edits). */

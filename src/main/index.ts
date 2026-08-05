@@ -220,6 +220,14 @@ function registerIpc(win: BrowserWindow): void {
   // Renderer crash/error reports land in the same log file as the main process.
   ipcMain.on('log:error', (_e, message: string) => log.error('[renderer]', message))
 
+  ipcMain.handle('app:info', () => ({
+    version: app.getVersion(),
+    electron: process.versions.electron,
+    chrome: process.versions.chrome,
+    node: process.versions.node,
+    platform: `${process.platform} ${process.arch}`
+  }))
+
   ipcMain.handle('vault:open', async (): Promise<VaultInfo | null> => {
     const result = await dialog.showOpenDialog({
       properties: ['openDirectory', 'createDirectory']

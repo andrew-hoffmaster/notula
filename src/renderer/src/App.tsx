@@ -44,6 +44,7 @@ import SourceControl from './components/SourceControl.js'
 import DiffModal from './components/DiffModal.js'
 import HistoryModal from './components/HistoryModal.js'
 import PdfViewer from './components/PdfViewer.js'
+import AboutModal from './components/AboutModal.js'
 import ActivityBar, { type SidebarView } from './components/ActivityBar.js'
 import { useGit } from './useGit.js'
 import { classify, type ChangeClass } from '@shared/git.js'
@@ -63,6 +64,7 @@ export default function App(): React.JSX.Element {
   const [appearance, setAppearance] = useState<Appearance>(loadAppearance)
   const [showSettings, setShowSettings] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
+  const [showAbout, setShowAbout] = useState(false)
   // Git: sidebar view, diff/history modals, and live status for the open vault.
   const [sidebarView, setSidebarView] = useState<SidebarView>('files')
   const [diffModal, setDiffModal] = useState<{ title: string; diff: string } | null>(null)
@@ -271,7 +273,8 @@ export default function App(): React.JSX.Element {
       save: saveActive,
       'close-tab': closeActive,
       help: () => setShowHelp(true),
-      settings: () => setShowSettings(true)
+      settings: () => setShowSettings(true),
+      about: () => setShowAbout(true)
     }
     return window.api.app.onMenu((action) => actions[action]?.())
   }, [newNote, newFolder, openVault, saveActive, closeActive])
@@ -578,6 +581,8 @@ export default function App(): React.JSX.Element {
       )}
 
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+
+      {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
 
       {diffModal && (
         <DiffModal

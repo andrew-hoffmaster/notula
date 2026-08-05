@@ -36,7 +36,8 @@ export function buildAppMenu(win: BrowserWindow): Menu {
         { label: 'Markdown Help', click: () => send('help') },
         { label: 'Appearance Settings', click: () => send('settings') },
         { type: 'separator' },
-        { label: 'GitHub Repository', click: () => void shell.openExternal(REPO_URL) }
+        { label: 'GitHub Repository', click: () => void shell.openExternal(REPO_URL) },
+        { label: 'About Notula', click: () => send('about') }
       ]
     }
   ]
